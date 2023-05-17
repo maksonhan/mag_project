@@ -1,0 +1,4 @@
+https://only-to-top.ru/blog/tools/2018-05-11-avtoobnovlenie-stranicy-brauzera-pri-napisanii-koda.html
+
+
+browser-sync start --server --files "php/*.php,css/*.css,js/*.js,html/*.html,*.*"

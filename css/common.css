@@ -1,0 +1,113 @@
+@import url('../fonts/stylesheet.css');
+
+body {
+	width: 100%;
+	height: 100%;
+	overflow-x: hidden;
+	font-family: 'Montserrat';
+	font-weight: 500;
+	padding-bottom: 100px;
+}
+
+a {
+	text-decoration: none;
+}
+
+section {
+	width: 100%;
+}
+
+.main-section {
+	margin-top: 20px;
+}
+
+.main-section h1 {
+	width: 700px;
+	margin-left: -20px;
+	margin-bottom: 20px;
+}
+
+.wrapper {
+	width: 1250px;
+	margin: 0 auto;
+}
+
+.container {
+	width: 100%;
+	display: flex;
+}
+
+.inp-param_block {
+	width: 70%;
+	margin-right: 50px;
+}
+
+.inp-param_block table {
+	border-spacing: 25px 30px;
+}
+
+.inp-param_block table td input {
+	padding: 5px 0px 5px 5px;
+}
+
+.inp-param_block table td a, .startSim, .resetSketch, .reDrawRandomParticles {
+	display: block;
+	text-align: center;
+	width: 300px;
+	margin: 20px auto;
+	padding: 15px;
+	
+	font-size: 16px;
+	border: 0px;
+	cursor: pointer;
+	box-shadow: 4px 4px 5px rgba(0,0,0,0.5);
+	-webkit-transition: all .45s;
+	-o-transition: all .45s;
+	transition: all .45s;
+}
+
+.inp-param_block table td a:hover, .startSim:hover {
+	background-color: #008B5D;
+}
+
+.startSim {
+	position: absolute;
+	bottom: 100px;
+	background-color: #00BB7D;
+	color:#fff;
+}
+
+.resetSketch{
+	position: absolute;
+	left: 350px;
+	bottom: 100px;
+	background-color: #ccc;
+	color:#333;
+}
+
+.resetSketch:hover {
+	background-color: #c1c1c1;
+}
+
+.reDrawRandomParticles{
+	position: absolute;
+	left: 10px;
+	bottom: 0px;
+	background-color: lightgreen;
+	color:#333;
+}
+
+.reDrawRandomParticles:hover {
+	opacity: 0.7;
+}
+
+.task-img_block img {
+	width: 100%;
+}
+
+
+#chartdiv {
+	margin: 50px auto 0px auto;
+	width: 80%;
+	height: 500px;
+}
