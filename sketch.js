@@ -1,9 +1,14 @@
 let tumblerDraw = false;
-let amountParticles = 100;
-let maxParticlesVertical = 10;
+let amountParticles = 700;
+let maxParticlesVertical = 25;
 
-let SideA = 200;
-let SideB = 200;
+//inizialization sample shape
+let SideA;
+let SideB;
+let b2;
+let a2;
+let b1;
+let a1;
 
 class MetalParticle {
 
@@ -14,13 +19,13 @@ class MetalParticle {
     this.y;
     this.xFirst;
     this.yFirst;
-    this.r = 5;
+    this.r = 3;
     this.xSpeed = random(-0.5,0.5);
     this.ySpeed = random(-0.5,0.5);
   }
 
   createParticle() {
-    circle(this.x,this.y,this.r);
+    circle(this.x, this.y, this.r);
   }
 
   restartPos() {
@@ -40,6 +45,12 @@ class MetalParticle {
     if(this.y >= SideA || this.y <=  0) {     
       this.restartPos();      
     }
+
+    //проверка на попадание частицы во внутренний контур. 
+    if(this.y <= SideB - a2 & this.x<= SideA - a1) {
+      if( this.x >= a1 & this.y >=  a2  ) this.restartPos();
+    }
+
   }
 
 }
@@ -47,9 +58,9 @@ class MetalParticle {
 let particles = [];
 
 
-
 function setup() {
-  createCanvas(650, 500);  
+  createCanvas(1000, 800);
+
 
   for(let i = 0; i<amountParticles; i++) {
     particles.push(new MetalParticle());    
@@ -58,42 +69,118 @@ function setup() {
     // particles[i].yFirst = particles[i].y;
   }
 
-  setGrid(particles);
+  // setGrid(particles);
 
-  fill(51);
   noLoop();
 }
 
 
 function draw() {
   background(51);
-  stroke(255);
-  rect(width/2 - SideA/2, height/2 - SideB/2, SideA, SideB);
+  fill('#BAC3D5');
+  
+  beginShape();
+  vertex(width/2 - SideA/2, height/2 - SideB/2);
+  vertex(width/2 + SideA/2, height/2 - SideB/2);
+  vertex(width/2 + SideA/2, height/2 + SideB/2);
+  vertex(width/2 - SideA/2, height/2 + SideB/2);
+
+
+  beginContour();
+  vertex(width/2 - SideA/2 + a1, height/2 - SideB/2 + a2);
+  vertex(width/2 - SideA/2 + a1, height/2 + SideB/2 - a2);
+  vertex(width/2 + SideA/2 - a1, height/2 + SideB/2 - a2);
+  vertex(width/2 + SideA/2 - a1, height/2 - SideB/2 + a2);
+  endContour();
+
+  endShape(CLOSE);
+
   translate(width/2 - SideA/2,height/2 - SideB/2);
+  fill('red');
+
   for (let i = 0; i<particles.length; i++) {
     particles[i].createParticle();
     particles[i].moveParticle();
   }
-  fill(51);
+
+  
 }
 
 
 
 function setGrid(particles) {
 
-  let devider = ceil(amountParticles/maxParticlesVertical);
+  let devider = ceil(amountParticles/maxParticlesVertical); //делитель определяет количество стобцов на которое будет разбиваться сетка из частиц
 
   for(let a = 0; a<devider; a++) {
   let sliceParticles = particles.slice((amountParticles/devider)*a, (amountParticles/devider)*(a+1));
 
-  for (let i = 0; i< sliceParticles.length; i++) {
-    sliceParticles[i].x = (a+1)*SideA/(devider+1);
-    sliceParticles[i].y = (i+1)*SideB/(sliceParticles.length+1);
+  for (let i = 0; i<sliceParticles.length; i++) {
+
+    let posX = (a+1)*SideA/(devider+1);
+    let posY = (i+1)*SideB/(sliceParticles.length+1);
+
+    if(posY <= SideB - a2 & posX <= SideA - a1) {
+      //проверяем расположение частиц относительно внутренного контура, если попадают, то перепрыгиваем на следующую итерацию, не присваивая значения
+      if( posX >= a1 & posY >=  a2  ) {
+        sliceParticles[i].x = NaN; // Убираем частицы, которые попадают в новый внутренний контур при изменение параметров изделия
+        sliceParticles[i].y = NaN;
+        sliceParticles[i].xFirst = NaN;
+        sliceParticles[i].yFirst = NaN;
+
+        continue;
+      }
+    }
+
+    sliceParticles[i].x = posX;
+    sliceParticles[i].y = posY;
+
 
     sliceParticles[i].xFirst = sliceParticles[i].x;
     sliceParticles[i].yFirst = sliceParticles[i].y;
   }
+
  }
+}
+
+function getShape(event) {
+    b2 =  document.getElementById('b2').value*10;
+    a2 =  b2-document.getElementById('a2').value*10;
+    b1 =  document.getElementById('b1').value*10;
+    a1 =  b1-document.getElementById('a1').value*10;
+    SideA =  b1*2;;
+    SideB =  b2*2;
+
+    //проверяем на корректно введеные значения
+    if(!checkInp(a1,b1,a2,b2)) {event.preventDefault()};
+
+    setGrid(particles);
+
+    document.getElementById('simulation').style.display = "flex";
+    document.getElementById('chart-section').style.display = "block";
+
+    redraw();
+
+    //скролинг к блоку
+    const el = document.getElementById('simulation_block');
+    el.scrollIntoView({behavior: "smooth"});
+}
+
+
+function checkInp(a1,b1,a2,b2) {
+
+  //Проверка, на пустые инпуты
+  if (Number(document.getElementById('a1').value) >= Number(document.getElementById('b1').value)) {
+    alert('Значение b1 должно быть > a1');
+    return false;
+  }
+  else if (Number(document.getElementById('a2').value) >= Number(document.getElementById('b2').value)) {
+    alert('Значение b2 должно быть > a2');
+    return false;
+  }
+  else
+    {return true;}
+  
 }
 
 
@@ -108,16 +195,16 @@ function resetSketch() {
   }   
 }
 
-function reDrawRandomParticles() {
+// function reDrawRandomParticles() {
 
-  stopDraw()
+//   stopDraw()
 
-  for(let i = 0; i<particles.length; i++) {
-    particles[i].x = random(10, SideA-10);
-    particles[i].y = random(10, SideB-10);
-  } 
+//   for(let i = 0; i<particles.length; i++) {
+//     particles[i].x = random(10, SideA-10);
+//     particles[i].y = random(10, SideB-10);
+//   } 
 
-}
+// }
 
 
 function stopDraw() {
@@ -131,7 +218,6 @@ function stopDraw() {
   }
 
 }
-
 
 
       

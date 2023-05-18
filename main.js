@@ -50,10 +50,12 @@ function plot() {
 	chart.cursor.lineY.disabled = true;
 
 
-	//скролинг к блоку
-	const el = document.getElementById('chartdiv');
-	el.scrollIntoView({behavior: "smooth"});
+ 	// document.getElementById('simulation').style.display = "flex";
+ 	// document.getElementById('chart-section').style.display = "block";
 
+ 	//скролинг к блоку
+	const el = document.getElementById('simulation_block');
+	el.scrollIntoView({behavior: "smooth"});
 }
 
 
