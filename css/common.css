@@ -79,7 +79,7 @@ section {
 
 .simulation {
 	margin-top: 50px;
-	display: none;
+	display: flex;
 	width: 100%;
 	align-items: center;
 	justify-content: center;
