@@ -10,6 +10,7 @@ let b2;
 let a2;
 let b1;
 let a1;
+let wchan;
 
 class MetalParticle {
 
@@ -35,49 +36,70 @@ class MetalParticle {
     // this.ySpeed = 0;
   }
 
+  chooseCentrPartcleDir() {
+    //расстояние до верхнего края центральной части
+    let distY1 = abs(this.y - (SideY/2 - a2 + wchan ));
+    //расстояние до нижнего края центральной части
+    let distY2 = abs(this.y - (SideY/2 + a2 - wchan ));
+    //расстояние до левого края центральной части
+    let distX1 = abs(this.x - (SideX/2 - a1 + wchan ));
+    //расстояние до правого края центральной части
+    let distX2 = abs(this.x - (SideX/2 + a1 - wchan ));
+
+    if(((distY1 == distY2) & (distY1/distX1 <= 1) & (distY1/distX2 <= 1)) || (distX2/distY1 == 1) || (distX1/distY1 == 1) || (distX1/distY2 == 1) || (distX2/distY2 == 1)) return;
+
+    //разбивакем движение по секторам
+    if(distY1 < distY2 & (distX1/distY1) > 1 & (distX2/distY1) > 1) this.y -= constSpeed;
+    else if (distY2 < distY1 & (distX1/distY2) > 1 & (distX2/distY2) > 1) this.y += constSpeed;
+    else if(distX1 < distX2) this.x -= constSpeed;
+    else this.x += constSpeed;
+
+    
+  }
+
 
   moveParticle() {
 
-    //разбиеие движения по секторам
-    if(this.x < SideX - a1 & this.y < a2 ) {
-      if( this.x > a1 ) {
+    //разбиеие движения по секторам с внешней стороны от канала
+    if(this.x < SideX/2 + a1 & this.y < SideY/2 - a2 ) {
+      if( this.x > SideX/2 - a1 ) {
         this.y += constSpeed;
       }
       else {
-        this.x += PullToVertex(this.x,this.y,a1,a2).dirX;
-        this.y += PullToVertex(this.x,this.y,a1,a2).dirY;
+        this.x += PullToVertex(this.x,this.y,(SideX/2 - a1),(SideY/2 - a2)).dirX;
+        this.y += PullToVertex(this.x,this.y,(SideX/2 - a1),(SideY/2 - a2)).dirY;
       }
     }
 
-    else if (this.x < SideX - a1 & this.y > SideY - a2) {
-      if( this.x > a1 ) {
+    else if (this.x < SideX/2 + a1 & this.y > SideY/2 + a2) {
+      if( this.x > SideX/2 - a1 ) {
         this.y -= constSpeed;
       }
       else {
-        this.x += PullToVertex(this.x,this.y,a1,SideY - a2).dirX;
-        this.y += PullToVertex(this.x,this.y,a1,SideY - a2).dirY;
+        this.x += PullToVertex(this.x,this.y,(SideX/2 - a1),(SideY/2 + a2)).dirX;
+        this.y += PullToVertex(this.x,this.y,(SideX/2 - a1),(SideY/2 + a2)).dirY;
       }
     }
 
-    else if (this.x < SideX & this.y < SideY - a2) {
-      if( this.x > SideX - a1 & this.y > a2) {
+    else if (this.x < SideX & this.y < SideY/2 + a2) {
+      if( this.x > SideX/2 + a1 & this.y > SideY/2 - a2) {
         this.x -= constSpeed;
       }
 
-      else if(this.x <= a1) {
+      else if(this.x <= SideX/2 - a1) {
         this.x += constSpeed;
       }
 
-      else if(this.x > SideX-a1 & this.y < a2) {
-        this.x += PullToVertex(this.x,this.y,SideX-a1,a2).dirX;
-        this.y += PullToVertex(this.x,this.y,SideX-a1,a2).dirY;
+      else if(this.x > SideX/2+a1 & this.y < SideY/2 - a2) {
+        this.x += PullToVertex(this.x,this.y,(SideX/2 + a1),(SideY/2 - a2)).dirX;
+        this.y += PullToVertex(this.x,this.y,(SideX/2 + a1),(SideY/2 - a2)).dirY;
       }
 
     }
 
     else {
-      this.x += PullToVertex(this.x,this.y,SideX-a1,SideY - a2).dirX;
-      this.y += PullToVertex(this.x,this.y,SideX-a1,SideY - a2).dirY;
+      this.x += PullToVertex(this.x,this.y,(SideX/2 + a1),(SideY/2 + a2)).dirX;
+      this.y += PullToVertex(this.x,this.y,(SideX/2 + a1),(SideY/2 + a2)).dirY;
     }
 
 
@@ -96,9 +118,20 @@ class MetalParticle {
     // }
 
     //проверка на попадание частицы во внутренний контур. 
-    if(this.y <= SideY - a2 & this.x <= SideX - a1) {
-      if( this.x >= a1 & this.y >=  a2  ) this.restartPos();
-    }  
+    // if(this.y <= SideY/2 + a2 & this.x <= SideX/2 + a1) {
+    //   if( this.x >= SideX/2 - a1 & this.y >=  SideY/2 - a2  ) this.restartPos();
+    // }
+
+
+    //разбиеие движения по секторам с внешней стороны от канала
+    if((this.x <= SideX/2 + a1 & this.y <= SideY/2 + a2) & (this.x >= SideX/2 - a1 & this.y >= SideY/2 - a2)) {
+
+      this.chooseCentrPartcleDir();
+
+      if (!((this.x >= SideX/2 - a1 + wchan & this.x <= SideX/2 + a1 - wchan) & (this.y >= SideY/2 - a2 + wchan & this.y <= SideY/2 + a2 -wchan))) {
+        this.restartPos();
+      }
+    }
 
   }
 
@@ -144,9 +177,10 @@ function setup() {
   }
 
   b2 =  document.getElementById('b2').value*10;
-  a2 =  b2-document.getElementById('a2').value*10;
+  a2 =  document.getElementById('a2').value*10;
   b1 =  document.getElementById('b1').value*10;
-  a1 =  b1-document.getElementById('a1').value*10;
+  a1 =  document.getElementById('a1').value*10;
+  wchan =  document.getElementById('wchan').value*10;
   SideX =  b1*2;;
   SideY =  b2*2;
 
@@ -168,13 +202,16 @@ function draw() {
 
 
   beginContour();
-  vertex(width/2 - SideX/2 + a1, height/2 - SideY/2 + a2);
-  vertex(width/2 - SideX/2 + a1, height/2 + SideY/2 - a2);
-  vertex(width/2 + SideX/2 - a1, height/2 + SideY/2 - a2);
-  vertex(width/2 + SideX/2 - a1, height/2 - SideY/2 + a2);
+  vertex(width/2 - a1, height/2 - a2);
+  vertex(width/2 - a1, height/2 + a2);
+  vertex(width/2 + a1, height/2 + a2);
+  vertex(width/2 + a1, height/2 - a2);
   endContour();
 
   endShape(CLOSE);
+
+  fill('#BAC3D5');
+  rect(width/2 - a1 + wchan, height/2 - a2 + wchan, a1*2-wchan*2, a2*2-wchan*2);
 
   translate(width/2 - SideX/2,height/2 - SideY/2);
   fill('red');
@@ -202,16 +239,25 @@ function setGrid(particles) {
     let posX = (a+1)*SideX/(devider+1);
     let posY = (i+1)*SideY/(sliceParticles.length+1);
 
-    if(posY <= SideY - a2 & posX <= SideX - a1) {
+    if( (posX <= SideX/2 + a1 & posY <= SideY/2 + a2) & (posX >= SideX/2 - a1 & posY >= SideY/2 - a2)) {
       //проверяем расположение частиц относительно внутренного контура, если попадают, то перепрыгиваем на следующую итерацию, не присваивая значения
-      if( posX >= a1 & posY >=  a2  ) {
+      
+      if (!((posX >= SideX/2 - a1 + wchan & posX <= SideX/2 + a1 - wchan) & (posY >= SideY/2 - a2 + wchan & posY <= SideY/2 + a2 -wchan))) {
         sliceParticles[i].x = NaN; // Убираем частицы, которые попадают в новый внутренний контур при изменение параметров изделия
         sliceParticles[i].y = NaN;
         sliceParticles[i].xFirst = NaN;
         sliceParticles[i].yFirst = NaN;
-
         continue;
       }
+
+      // if( posX >= SideX/2-a1 & posY >= SideY/2 - a2  ) {
+      //   sliceParticles[i].x = NaN; // Убираем частицы, которые попадают в новый внутренний контур при изменение параметров изделия
+      //   sliceParticles[i].y = NaN;
+      //   sliceParticles[i].xFirst = NaN;
+      //   sliceParticles[i].yFirst = NaN;
+
+      //   continue;
+      // }
     }
 
     sliceParticles[i].x = posX;
@@ -231,11 +277,12 @@ function getShape(event) {
     if(!checkInp()) {event.preventDefault()};
 
     b2 =  document.getElementById('b2').value*10;
-    a2 =  b2-document.getElementById('a2').value*10;
+    a2 =  document.getElementById('a2').value*10;
     b1 =  document.getElementById('b1').value*10;
-    a1 =  b1-document.getElementById('a1').value*10;
-    SideX =  b1*2;;
+    a1 =  document.getElementById('a1').value*10;
+    SideX =  b1*2;
     SideY =  b2*2;
+    wchan =  document.getElementById('wchan').value*10;
 
 
     setGrid(particles);
@@ -262,6 +309,17 @@ function checkInp() {
     alert('Значение b2 должно быть > a2');
     return false;
   }
+
+  else if (Number(document.getElementById('wchan').value) >= Number(document.getElementById('a1').value)) {
+    alert('Значение ширины канала не должно быть > а1');
+    return false;
+  }
+
+  else if (Number(document.getElementById('wchan').value) >= Number(document.getElementById('a2').value)) {
+    alert('Значение ширины канала не должно быть > а2');
+    return false;
+  }
+
   else
     {return true;}
   

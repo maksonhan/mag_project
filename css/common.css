@@ -51,7 +51,7 @@ section {
 	padding: 5px 0px 5px 5px;
 }
 
-.inp-param_block table td a, .startSim, .resetSketch, .reDrawRandomParticles {
+.inp-param_block table td a, .startSim, .resetSketch, .reDrawRandomParticles, .secondZoom {
 	border-radius: 10px;
 	display: block;
 	text-align: center;
@@ -105,6 +105,15 @@ section {
 
 .resetSketch:hover {
 	background-color: #c1c1c1;
+}
+
+.secondZoom{
+	background: linear-gradient(9.7deg, #FFB9B9 6.4%, #E0E7FF 91.87%);
+	color:#333;
+}
+
+.secondZoom:hover {
+	background: linear-gradient(9.7deg, #E0E7FF 6.4%, #FFB9B9 91.87%);
 }
 
 .reDrawRandomParticles{
