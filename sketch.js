@@ -1,7 +1,9 @@
+let firstApproach = true;
 let tumblerDraw = false;
 let amountParticles = 600;
 let maxParticlesVertical = 25;
 let constSpeed = 1;
+let counterFillChannel = 45;
 
 //inizialization sample shape
 let SideX;
@@ -26,7 +28,7 @@ class MetalParticle {
   }
 
   createParticle() {
-    circle(this.x, this.y, this.r);
+    firstApproach ? circle(this.x, this.y, this.r) : circle(this.x, this.y, this.r + 2);
   }
 
   restartPos() {
@@ -34,6 +36,7 @@ class MetalParticle {
     this.y = this.yFirst;
     // this.xSpeed = 0;
     // this.ySpeed = 0;
+    counterFillChannel += 0.005;
   }
 
   chooseCentrPartcleDir() {
@@ -60,7 +63,7 @@ class MetalParticle {
 
   moveParticle() {
 
-    //разбиеие движения по секторам с внешней стороны от канала
+    //разбиение движения по секторам с внешней стороны от канала
     if(this.x < SideX/2 + a1 & this.y < SideY/2 - a2 ) {
       if( this.x > SideX/2 - a1 ) {
         this.y += constSpeed;
@@ -138,7 +141,7 @@ class MetalParticle {
 
   makeTrace() {
     push();
-    strokeWeight(0.3);
+    firstApproach ? strokeWeight(0.3) : strokeWeight(0.7);
     stroke('#EB5250');
     line(this.x, this.y, this.xFirst, this.yFirst);
     pop();
@@ -166,7 +169,7 @@ let particles = [];
 
 
 function setup() {
-  createCanvas(1000, 800);
+  createCanvas(1000, 730);
 
 
   for(let i = 0; i<amountParticles; i++) {
@@ -191,37 +194,76 @@ function setup() {
 
 
 function draw() {
-  background(51);
-  fill('#BAC3D5');
-  
-  beginShape();
-  vertex(width/2 - SideX/2, height/2 - SideY/2);
-  vertex(width/2 + SideX/2, height/2 - SideY/2);
-  vertex(width/2 + SideX/2, height/2 + SideY/2);
-  vertex(width/2 - SideX/2, height/2 + SideY/2);
 
+  background('#2B2D31');
 
-  beginContour();
-  vertex(width/2 - a1, height/2 - a2);
-  vertex(width/2 - a1, height/2 + a2);
-  vertex(width/2 + a1, height/2 + a2);
-  vertex(width/2 + a1, height/2 - a2);
-  endContour();
+  (counterFillChannel <= 84) ? fillChannel(counterFillChannel) : fillChannel(84);
 
-  endShape(CLOSE);
 
   fill('#BAC3D5');
-  rect(width/2 - a1 + wchan, height/2 - a2 + wchan, a1*2-wchan*2, a2*2-wchan*2);
 
-  translate(width/2 - SideX/2,height/2 - SideY/2);
-  fill('red');
+  if(firstApproach) {
+    beginShape();
+    vertex(width/2 - SideX/2, height/2 - SideY/2);
+    vertex(width/2 + SideX/2, height/2 - SideY/2);
+    vertex(width/2 + SideX/2, height/2 + SideY/2);
+    vertex(width/2 - SideX/2, height/2 + SideY/2);
 
 
-  for (let i = 0; i<particles.length; i++) {
-    particles[i].createParticle();
-    particles[i].moveParticle();
-    particles[i].makeTrace();
+    beginContour();
+    vertex(width/2 - a1, height/2 - a2);
+    vertex(width/2 - a1, height/2 + a2);
+    vertex(width/2 + a1, height/2 + a2);
+    vertex(width/2 + a1, height/2 - a2);
+    endContour();
+
+    endShape();
+
+    rect(width/2 - a1 + wchan, height/2 - a2 + wchan, a1*2-wchan*2, a2*2-wchan*2);
+
+    translate(width/2 - SideX/2,height/2 - SideY/2);
+    fill('red');
+
+
+    for (let i = 0; i<particles.length; i++) {
+      particles[i].createParticle();
+      particles[i].moveParticle();
+      particles[i].makeTrace();
+    }
+
   }
+
+   if(!firstApproach) {
+    beginShape();
+    vertex(-SideX/2, height - SideY/2);
+    vertex(SideX/2, height - SideY/2);
+    vertex(SideX/2, height + SideY/2);
+    vertex(-SideX/2, height + SideY/2);
+
+
+    beginContour();
+    vertex(-a1, height - a2);
+    vertex(-a1, height + a2);
+    vertex(a1, height + a2);
+    vertex(a1, height - a2);
+    endContour();
+
+    endShape(CLOSE);
+
+    fill('#BAC3D5');
+    rect(- a1 + wchan, height - a2 + wchan, a1*2-wchan*2, a2*2-wchan*2);
+
+    translate(-SideX/2, height-SideY/2);
+    fill('red');
+
+    for (let i = 0; i<particles.length; i++) {
+      particles[i].createParticle();
+      particles[i].moveParticle();
+      particles[i].makeTrace();
+    }
+  
+   }
+  
   
 }
 
@@ -273,9 +315,12 @@ function setGrid(particles) {
 
 function getShape(event) {
 
-    //проверяем на корректно введеные значения
-    if(!checkInp()) {event.preventDefault()};
+  counterFillChannel = 45
 
+  //проверяем на корректно введеные значения
+  if(!checkInp()) {event.preventDefault()};
+
+  if(firstApproach) {
     b2 =  document.getElementById('b2').value*10;
     a2 =  document.getElementById('a2').value*10;
     b1 =  document.getElementById('b1').value*10;
@@ -283,18 +328,30 @@ function getShape(event) {
     SideX =  b1*2;
     SideY =  b2*2;
     wchan =  document.getElementById('wchan').value*10;
+  }
+
+  else {
+    b2 =  2.3*document.getElementById('b2').value*10;
+    a2 =  2.3*document.getElementById('a2').value*10;
+    b1 =  2.3*document.getElementById('b1').value*10;
+    a1 =  2.3*document.getElementById('a1').value*10;
+    SideX =  b1*2;
+    SideY =  b2*2;
+    wchan =  2.3*document.getElementById('wchan').value*10;
+  }
+ 
 
 
-    setGrid(particles);
+  setGrid(particles);
 
-    document.getElementById('simulation').style.display = "flex";
-    document.getElementById('chart-section').style.display = "block";
+  document.getElementById('simulation').style.display = "flex";
+  document.getElementById('chart-section').style.display = "block";
 
-    redraw();
+  redraw();
 
-    //скролинг к блоку
-    const el = document.getElementById('simulation_block');
-    el.scrollIntoView({behavior: "smooth"});
+  //скролинг к блоку
+  const el = document.getElementById('simulation_block');
+  el.scrollIntoView({behavior: "smooth"});
 }
 
 
@@ -327,6 +384,7 @@ function checkInp() {
 
 
 function resetSketch() {
+  counterFillChannel = 45;
   stopDraw();
 
   for(let i = 0; i<particles.length; i++) {
@@ -374,4 +432,88 @@ function PullToVertex(x,y,hx,hy) {
 }
 
 
-// console.log(PullToVertex(particles[1].x,particles[1].y,a1,a2));
+function changeApproach() {
+
+  firstApproach = !firstApproach;
+
+  if(!firstApproach) {
+    
+    b2 *= 2.3;
+    a2 *= 2.3;
+    b1 *= 2.3;
+    a1 *= 2.3;
+    wchan *= 2.3;
+    SideX *= 2.3;
+    SideY *= 2.3;
+    constSpeed *= 2.3;
+
+    setGrid(particles);
+    firstApproach = false;
+
+    document.getElementById('changeApproach').innerText = "Первое приблжение";
+  }
+
+  else {
+    
+    b2 /= 2.3;
+    a2 /= 2.3;
+    b1 /= 2.3;
+    a1 /= 2.3;
+    wchan /= 2.3;
+    SideX /= 2.3;
+    SideY /= 2.3;
+    constSpeed /= 2.3;
+
+    setGrid(particles);
+    firstApproach = true;
+
+    document.getElementById('changeApproach').innerText = "Второе приблжение";
+  }
+
+  redraw();
+}
+
+
+function fillChannel(i) {
+  colorMode(HSB);
+  fill(220,13,i);
+
+  if(firstApproach) {
+    beginShape();
+    vertex(width/2 - a1, height/2 - a2);
+    vertex(width/2 + a1, height/2 - a2);
+    vertex(width/2 + a1, height/2 + a2);
+    vertex(width/2 - a1, height/2 + a2);
+
+
+    beginContour();
+    vertex(width/2 - a1 + wchan, height/2 - a2 + wchan);
+    vertex(width/2 - a1 + wchan, height/2 + a2 - wchan);
+    vertex(width/2 + a1 - wchan, height/2 + a2 - wchan);
+    vertex(width/2 + a1 - wchan, height/2 - a2 + wchan);
+    endContour();
+
+    endShape();
+  }
+
+  else {
+    beginShape();
+
+    vertex(-a1, height - a2);
+    vertex(a1, height - a2);
+    vertex(a1, height + a2);
+    vertex(-a1, height + a2);
+
+    beginContour();
+    vertex(-a1 + wchan, height - a2 + wchan);
+    vertex(-a1 + wchan, height + a2 - wchan);
+    vertex(a1 - wchan, height + a2 - wchan);
+    vertex(a1 - wchan, height - a2 + wchan);
+  
+    endContour();
+    endShape();
+  }
+  
+  colorMode(RGB);
+}
+

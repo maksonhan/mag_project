@@ -31,7 +31,7 @@
 						</tr>
 						<tr>
 							<td>Внутренняя граница по X (a1)</td>
-							<td><input id="a1" name="a1" placeholder="0" value="15" type="text" maxlength="9"></td>
+							<td><input id="a1" name="a1" placeholder="0" value="25" type="text" maxlength="9"></td>
 							<td>(мм)</td>
 						</tr>
 						<tr>
@@ -41,7 +41,7 @@
 						</tr>
 						<tr>
 							<td>Внутренняя граница по Y (a2)</td>
-							<td><input id="a2" name="a2" placeholder="0" value="10" type="text" maxlength="9"></td>
+							<td><input id="a2" name="a2" placeholder="0" value="15" type="text" maxlength="9"></td>
 							<td>(мм)</td>
 						</tr>
 						<tr>
@@ -82,7 +82,7 @@
 				<td><a class="resetSketch" onclick="resetSketch()">Перерисовать</a></td>
 			</tr>
 			<tr>
-				<td><a class="secondApproach" onclick="resetSketch()">Второе приблжение</a></td>
+				<td><a id="changeApproach" class="changeApproach" onclick="changeApproach()">Второе приблжение</a></td>
 			</tr>
 <!-- 			<tr>
 				<td><a class="reDrawRandomParticles" onclick="reDrawRandomParticles()">Случайное расположение частиц</a></td>
