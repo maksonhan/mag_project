@@ -64,21 +64,21 @@ function getChartData(event) {
 	//берем значения из инпутов
 	let height = document.getElementById('height').value;
 	let tetaS = document.getElementById('tetaS').value;
-	let a1 = document.getElementById('a1').value;
-	let b1 = document.getElementById('b1').value;
 	let a2 = document.getElementById('a2').value;
+	let a = document.getElementById('a').value;
 	let b2 = document.getElementById('b2').value;
+	let b = document.getElementById('b').value;
 
 	//проверяем на корректно введеные значения
-	if(!checkInputs(height,tetaS,a1,b1,a2,b2)) {event.preventDefault()};
+	if(!checkInputs(height,tetaS,a2,a,b2,b)) {event.preventDefault()};
 
-	let chartData = createChartData(height,tetaS,a1,b1,a2,b2);
+	let chartData = createChartData(height,tetaS,a2,a,b2,b);
 	console.log(chartData);
 	return chartData;
 }
 
 //создание БД для построение графкиа
-function createChartData(height,tetaS,a1,b1,a2,b2) {
+function createChartData(height,tetaS,a2,a,b2,b) {
 		let devider = 100; 
 		let sliceHieght = height/devider; //разделим вводимое значение высоты на части, чтобы сделать точки абсциссы будущего графика.
 
@@ -87,40 +87,40 @@ function createChartData(height,tetaS,a1,b1,a2,b2) {
 		for (let i = 0; i < (devider); i++) {
 
 			dataPlot.push( {"height": sliceHieght*(i+1),
-			"pressure": calcSumPressure(sliceHieght*(i+1),tetaS,a1,b1,a2,b2),});//записываем данные в массив, чтобы потом использовать их для построения графика
+			"pressure": calcSumPressure(sliceHieght*(i+1),tetaS,a2,a,b2,b),});//записываем данные в массив, чтобы потом использовать их для построения графика
 		}
 
 		return dataPlot;
 }
 
 //проверка вводимых значений в инпуты
-function checkInputs(height,tetaS,a1,b1,a2,b2) {
+function checkInputs(height,tetaS,a2,a,b2,b) {
 
 	function mask(x) {
 		if (x.match("^[0-9]*[.,]?[0-9]+$")) return true;
 	}
 
 	//Проверка, на пустые инпуты
-	if ((height.length == 0) || (tetaS.length == 0) || (a1.length == 0) || (b1.length == 0) || (a2.length == 0) || (b2.length == 0)) {
+	if ((height.length == 0) || (tetaS.length == 0) || (a2.length == 0) || (a.length == 0) || (b2.length == 0) || (b.length == 0)) {
 		alert('Заполните все поля!');
 		return false;
 	}
 	//Проверка, на исключение букв в инпутах
-	if ((!mask(height)) || (!mask(tetaS)) || (!mask(a1)) || (!mask(b1)) || (!mask(a2)) || (!mask(b2))) {
+	if ((!mask(height)) || (!mask(tetaS)) || (!mask(a2)) || (!mask(a)) || (!mask(b2)) || (!mask(b))) {
 		alert('Значения должы быть числовыми!');
 		return false;
 	}
 	// Проверка на то, что вводимые значения будут больше 0
-	else if ((Number(height) <= 0) || (Number(tetaS) <= 0) || (Number(a1) <= 0) || (Number(b1) <= 0) || (Number(a2) <= 0) || (Number(b2) <= 0)){
+	else if ((Number(height) <= 0) || (Number(tetaS) <= 0) || (Number(a2) <= 0) || (Number(a) <= 0) || (Number(b2) <= 0) || (Number(b) <= 0)){
 		alert('Вводимые значения должны быть > 0');
 		return false;
 	}
-	else if (Number(a1) >= (Number(b1))) {
-		alert('Значение b1 должно быть > a1');
+	else if (Number(a2) >= (Number(a))) {
+		alert('Значение a должно быть > a2');
 		return false;
 	}
-	else if (Number(a2) >= (Number(b2))) {
-		alert('Значение b2 должно быть > a2');
+	else if (Number(b2) >= (Number(b))) {
+		alert('Значение b должно быть > b2');
 		return false;
 	}
 	else
@@ -130,7 +130,7 @@ function checkInputs(height,tetaS,a1,b1,a2,b2) {
 
 
 // вычисление суммарной силы контактного давления
-function calcSumPressure(height,tetaS,a1,b1,a2,b2) {
+function calcSumPressure(height,tetaS,a2,a,b2,b) {
 
 	let P1;
 	let P2;
@@ -139,16 +139,16 @@ function calcSumPressure(height,tetaS,a1,b1,a2,b2) {
 	let sumP;
 
 // Вычисление силы в 1 области
-	P1 = a1*2*tetaS*(b2-a2)*(1+(1/(2*height))*(b2+a2)-a2/height);
+	P1 = a2*2*tetaS*(b-b2)*(1+(1/(2*height))*(b+b2)-b2/height);
 
 // Вычисление силы во 2 области	
-	P2 = a2*2*tetaS*(b1-a1)*(1+(1/(2*height))*(b1+a1)-a1/height);
+	P2 = b2*2*tetaS*(a-a2)*(1+(1/(2*height))*(a+a2)-a2/height);
 
 // Вычисление силы в 3 области	
-	P3 = tetaS*(b1-a1)*(b2-a2)+(2/3)*(tetaS/height)*((b1-a1)**3)*(((b2-a2)/(((b2-a2)**2 + (b1-a1)**2)**(1/2)))*(((b2-a2)**2)+((b1-a1)**2))/((b1-a1)**2)+(1/4)*Math.log(Math.abs((b2-a2-((((b2-a2)**2)+((b1-a1)**2))**(1/2)))/(b2-a2+((((b2-a2)**2)+((b1-a1)**2))**(1/2))))));
+	P3 = tetaS*(a-a2)*(b-b2)+(2/3)*(tetaS/height)*((a-a2)**3)*(((b-b2)/(((b-b2)**2 + (a-a2)**2)**(1/2)))*(((b-b2)**2)+((a-a2)**2))/((a-a2)**2)+(1/4)*Math.log(Math.abs((b-b2-((((b-b2)**2)+((a-a2)**2))**(1/2)))/(b-b2+((((b-b2)**2)+((a-a2)**2))**(1/2))))));
 
 // Вычисление силы в 4 области	
-	P4 = tetaS*(b1-a1)*(b2-a2)+(1/3)*(tetaS/height)*((b2-a2)**3)*(((b1-a1)/(((b2-a2)**2 + (b1-a1)**2)**(1/2)))*(((b2-a2)**2)+((b1-a1)**2))/((b2-a2)**2)+(1/2)*Math.log(Math.abs((b1-a1-((((b2-a2)**2)+((b1-a1)**2))**(1/2)))/(b1-a1+((((b2-a2)**2)+((b1-a1)**2))**(1/2))))));
+	P4 = tetaS*(a-a2)*(b-b2)+(1/3)*(tetaS/height)*((b-b2)**3)*(((a-a2)/(((b-b2)**2 + (a-a2)**2)**(1/2)))*(((b-b2)**2)+((a-a2)**2))/((b-b2)**2)+(1/2)*Math.log(Math.abs((a-a2-((((b-b2)**2)+((a-a2)**2))**(1/2)))/(a-a2+((((b-b2)**2)+((a-a2)**2))**(1/2))))));
 
 // Суммарная сисла штамповки рассмотренной зоны
 	sumP = Math.trunc(4*(P1+P2+P3+P4)/1000); //выражаем в килоНьютанах

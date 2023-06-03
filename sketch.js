@@ -1,6 +1,7 @@
+let firstAmountParticles = 600;
 let firstApproach = true;
 let tumblerDraw = false;
-let amountParticles = 600;
+let amountParticles = firstAmountParticles;
 let maxParticlesVertical = 25;
 let constSpeed = 1;
 let counterFillChannel = 45;
@@ -8,11 +9,14 @@ let counterFillChannel = 45;
 //inizialization sample shape
 let SideX;
 let SideY;
+let b;
 let b2;
+let a;
 let a2;
-let b1;
-let a1;
 let wchan;
+let r1;
+let r2;
+let r3;
 
 class MetalParticle {
 
@@ -25,6 +29,7 @@ class MetalParticle {
     this.xSpeed;
     this.ySpeed;
     this.trace = [];
+    this.cornerZone = false;
   }
 
   createParticle() {
@@ -41,14 +46,15 @@ class MetalParticle {
 
   chooseCentrPartcleDir() {
     //расстояние до верхнего края центральной части
-    let distY1 = abs(this.y - (SideY/2 - a2 + wchan ));
+    let distY1 = abs(this.y - (SideY/2 - b2 + wchan ));
     //расстояние до нижнего края центральной части
-    let distY2 = abs(this.y - (SideY/2 + a2 - wchan ));
+    let distY2 = abs(this.y - (SideY/2 + b2 - wchan ));
     //расстояние до левого края центральной части
-    let distX1 = abs(this.x - (SideX/2 - a1 + wchan ));
+    let distX1 = abs(this.x - (SideX/2 - a2 + wchan ));
     //расстояние до правого края центральной части
-    let distX2 = abs(this.x - (SideX/2 + a1 - wchan ));
+    let distX2 = abs(this.x - (SideX/2 + a2 - wchan ));
 
+    // Остановка движения частиц находящихся на линии раздела течения
     if(((distY1 == distY2) & (distY1/distX1 <= 1) & (distY1/distX2 <= 1)) || (distX2/distY1 == 1) || (distX1/distY1 == 1) || (distX1/distY2 == 1) || (distX2/distY2 == 1)) return;
 
     //разбивакем движение по секторам
@@ -60,55 +66,192 @@ class MetalParticle {
     
   }
 
+  checkCrossCornerChannel(hx,hy) {
+
+    // let diag = sqrt(2*sq(r1+ wchan));
+    // let delta = diag - r1 + wchan;
+
+    // let firstDis = dist(this.xFirst, this.yFirst, hx, hy);
+
+    // let dis = dist(this.x, this.y, hx, hy);
+
+    // if(firstDis >= diag) {
+    //   dis <= diag? this.restartPos() : NaN;
+    // }
+
+    // else {
+    //   dis <= (r1+wchan) ? this.restartPos() : NaN;
+    // }
+
+    let dis = dist(this.x, this.y, hx, hy);
+    dis <= (r2) ? this.restartPos() : NaN;
+
+    // dis <= (sqrt(sq(a2-(a2-r1 - wchan) - wchan) + sq(b2-(b2-r1 - wchan) - wchan)) + wchan) ? this.restartPos() : NaN;
+    // sqrt(sq(a2-r1) + sq(b2-r1)) + wchan;
+  }
+
+
+    checkCrossCornerChannel3 () {
+
+    let diag = sqrt(sq(r2) + sq(r2));
+    let delta = diag - r2;
+    let disToVertexR2 = sqrt(sq(a2-r2) + sq(b2-r2));
+
+    let dis = dist(this.x, this.y, SideX/2, SideY/2);
+    dis <=  disToVertexR2 + (sqrt(sq(r2) + sq(r2)) - delta) ? this.restartPos() : NaN;
+  }
+
+  //   checkCrossCornerChannel4 () {
+
+  //   let disCenterToVertexR2 = dist(SideX/2, SideY/2, SideX/2 + a2 - r2, SideY/2 - b2 + r2);
+
+  //   let dis = dist(this.x, this.y, SideX/2, SideY/2);
+  //   dis <=  disCenterToVertexR2 + r2 ? this.restartPos() : NaN;
+  // }
+
+  //   checkCrossCornerChannel2 () {
+
+  //   let diag = sqrt(sq(r1) + sq(r1));
+  //   let delta = diag - r1;
+
+  //   let bigDiag = sqrt(sq(r2) + sq(r2));
+  //   let bigDelta = bigDiag - r2;
+    
+  //   let dis = dist(this.x, this.y, SideX/2, SideY/2);
+  //   dis <= sqrt(sq(r1) + sq(r1)) - delta ? this.restartPos() : NaN;
+  // }
+
 
   moveParticle() {
 
+    this.cornerZone = false;
+
+    let maxR = Math.max(wchan + r1, r2);
+
     //разбиение движения по секторам с внешней стороны от канала
-    if(this.x < SideX/2 + a1 & this.y < SideY/2 - a2 ) {
-      if( this.x > SideX/2 - a1 ) {
-        this.y += constSpeed;
-      }
-      else {
-        this.x += PullToVertex(this.x,this.y,(SideX/2 - a1),(SideY/2 - a2)).dirX;
-        this.y += PullToVertex(this.x,this.y,(SideX/2 - a1),(SideY/2 - a2)).dirY;
-      }
+
+     // сектор S11
+    if(this.x < SideX/2 + a2 - maxR & this.x > SideX/2 - a2 + maxR & this.y < SideY/2 - b2 ) 
+    { 
+      this.y += constSpeed;      
     }
 
-    else if (this.x < SideX/2 + a1 & this.y > SideY/2 + a2) {
-      if( this.x > SideX/2 - a1 ) {
+    // сектор симметричный S13 по Ox
+    else if(this.x <= SideX/2 - a2 + maxR & this.y <= SideY/2 - b2 + maxR & !(this.x > SideX/2 - a2 + wchan & this.y > SideY/2 - b2 + wchan) ) {
+
+     //симметричный по Ox S13
+      if(this.x <= SideX/2 - a2 + r2 & this.y <= SideY/2 - b2 + r2) {
+      this.cornerZone = true;
+      this.checkCrossCornerChannel(SideX/2 - a2 + r2, SideY/2 - b2 + r2 );
+      // this.checkCrossCornerChannel3();
+      this.x += PullToVertex(this.x,this.y,SideX/2 - a2 + r2, SideY/2 - b2 + r2).dirX;
+      this.y += PullToVertex(this.x,this.y,SideX/2 - a2 + r2, SideY/2 - b2 + r2).dirY;
+     }
+
+     else if (this.y > SideY/2 - b2 + r2) {
+      this.x += constSpeed;
+     }
+
+    else if (this.x > SideX/2 - a2 + r2 ) {
+      this.y += constSpeed;
+     }
+
+    }
+
+    // сектор симметричный S11 по Oy
+    else if (this.x < SideX/2 + a2 - maxR & this.x > SideX/2 - a2 + maxR & this.y > SideY/2 + b2) {
         this.y -= constSpeed;
-      }
-      else {
-        this.x += PullToVertex(this.x,this.y,(SideX/2 - a1),(SideY/2 + a2)).dirX;
-        this.y += PullToVertex(this.x,this.y,(SideX/2 - a1),(SideY/2 + a2)).dirY;
-      }
     }
 
-    else if (this.x < SideX & this.y < SideY/2 + a2) {
-      if( this.x > SideX/2 + a1 & this.y > SideY/2 - a2) {
+    // сектор симметричный S13 по диагонали и аналогичный S24
+    else if (this.x <= SideX/2 - a2 + maxR & this.y >= SideY/2 + b2 - maxR & !(this.x > SideX/2 - a2 + wchan & this.y < SideY/2 + b2 - wchan)) {
+      
+
+      //симметричный по диагонали S13
+      if(this.x <= SideX/2 - a2 + r2 & this.y >= SideY/2 + b2 - r2) {
+      this.cornerZone = true;
+      this.checkCrossCornerChannel(SideX/2 - a2 + r2, SideY/2 + b2 - r2 );
+      // this.checkCrossCornerChannel3();
+      this.x += PullToVertex(this.x,this.y,SideX/2 - a2 + r2, SideY/2 + b2 - r2 ).dirX;
+      this.y += PullToVertex(this.x,this.y,SideX/2 - a2 + r2, SideY/2 + b2 - r2 ).dirY;
+     }
+
+     else if (this.y < SideY/2 + b2 - r2) {
+      this.x += constSpeed;
+     }
+
+    else if (this.x > SideX/2 - a2 + r2 ) {
+      this.y -= constSpeed;
+     } 
+      
+    }
+
+    else if (this.x < SideX & this.y < SideY/2 + b2 - maxR) {
+      //сектор S12
+      if( this.x > SideX/2 + a2 & this.y > SideY/2 - b2 + maxR) {
         this.x -= constSpeed;
       }
-
-      else if(this.x <= SideX/2 - a1) {
+      //сектор симметричный S12 по Ox
+      else if(this.x < SideX/2 - a2) {
         this.x += constSpeed;
       }
 
-      else if(this.x > SideX/2+a1 & this.y < SideY/2 - a2) {
-        this.x += PullToVertex(this.x,this.y,(SideX/2 + a1),(SideY/2 - a2)).dirX;
-        this.y += PullToVertex(this.x,this.y,(SideX/2 + a1),(SideY/2 - a2)).dirY;
+      //сектор S13
+      else if(this.x >= SideX/2 + a2 - maxR & this.y <= SideY/2 - b2 + maxR & !(this.x < SideX/2 + a2 - wchan & this.y > SideY/2 - b2 + wchan)  ) {
+        
+         // S13
+         if(this.x >= SideX/2 + a2 - r2 & this.y <= SideY/2 - b2 + r2) {
+          this.cornerZone = true;
+          this.checkCrossCornerChannel(SideX/2 + a2 - r2, SideY/2 - b2 + r2 );
+          // this.checkCrossCornerChannel3();
+          this.x += PullToVertex(this.x,this.y,(SideX/2 + a2-r2),(SideY/2 - b2 + r2)).dirX;
+          this.y += PullToVertex(this.x,this.y,(SideX/2 + a2-r2),(SideY/2 - b2 + r2)).dirY;
+         }
+
+         else if (this.y > SideY/2 - b2 + r2) {
+          this.x -= constSpeed;
+         }
+
+        else if (this.x < SideX/2 + a2 - r2 ) {
+          this.y += constSpeed;
+         }
+        
       }
 
     }
 
-    else {
-      this.x += PullToVertex(this.x,this.y,(SideX/2 + a1),(SideY/2 + a2)).dirX;
-      this.y += PullToVertex(this.x,this.y,(SideX/2 + a1),(SideY/2 + a2)).dirY;
+    //сектор симметричный S13 по Oy
+    else if (this.x >= SideX/2 + a2 - maxR & this.y >= SideY/2 + b2 - maxR & !(this.x < SideX/2 + a2 - wchan & this.y < SideY/2 + b2 - wchan) ) {
+
+     //симметричный по Oy S13
+      if(this.x >= SideX/2 + a2 - r2 & this.y >= SideY/2 + b2 - r2) {
+      this.cornerZone = true;
+      this.checkCrossCornerChannel(SideX/2 + a2 - r2, SideY/2 + b2 - r2 );
+      // this.checkCrossCornerChannel3();
+      this.x += PullToVertex(this.x,this.y,SideX/2 + a2 - r2, SideY/2 + b2 - r2).dirX;
+      this.y += PullToVertex(this.x,this.y,SideX/2 + a2 - r2, SideY/2 + b2 - r2).dirY;
+     }
+
+     else if (this.y < SideY/2 + b2 - r2) {
+      this.x -= constSpeed;
+     }
+
+    else if (this.x < SideX/2 + a2 - r2 ) {
+      this.y -= constSpeed;
+     }     
+
+    }
+
+
+    // рестарт частиц, которые залетели в канал с внешней части детали (относительно канала), не считая угловые зоны
+    if (!this.cornerZone) {
+      if (!((this.x >= SideX/2 - a2 + wchan & this.x <= SideX/2 + a2 - wchan) & (this.y >= SideY/2 - b2 + wchan & this.y <= SideY/2 + b2 - wchan)))  {
+         ((this.x >= SideX/2 - a2 & this.x <= SideX/2 + a2) & (this.y >= SideY/2 - b2 & this.y <= SideY/2 + b2)) ? this.restartPos() : NaN;
+      }
     }
 
 
 
-    // this.x += this.xSpeed;
-    // this.y += this.ySpeed;
     if(this.x >= SideX || this.x <=  0) {     
       this.restartPos();
     }
@@ -116,22 +259,42 @@ class MetalParticle {
       this.restartPos();      
     }
 
-    // if( dist(this.xFirst, this.yFirst, this.x,this.y) >= constSpeed*100) {     
-    //   this.restartPos();      
-    // }
 
-    //проверка на попадание частицы во внутренний контур. 
-    // if(this.y <= SideY/2 + a2 & this.x <= SideX/2 + a1) {
-    //   if( this.x >= SideX/2 - a1 & this.y >=  SideY/2 - a2  ) this.restartPos();
-    // }
-
-
-    //разбиеие движения по секторам с внешней стороны от канала
-    if((this.x <= SideX/2 + a1 & this.y <= SideY/2 + a2) & (this.x >= SideX/2 - a1 & this.y >= SideY/2 - a2)) {
+    //определение движения частиц в центральной части заготовки
+    if((this.x <= SideX/2 + a2 - wchan & this.y <= SideY/2 + b2 - wchan) & (this.x >= SideX/2 - a2 + wchan & this.y >= SideY/2 - b2 + wchan)) {
 
       this.chooseCentrPartcleDir();
 
-      if (!((this.x >= SideX/2 - a1 + wchan & this.x <= SideX/2 + a1 - wchan) & (this.y >= SideY/2 - a2 + wchan & this.y <= SideY/2 + a2 -wchan))) {
+      //сектор S24
+     if(this.x > SideX/2 + a2 - wchan - r1 & this.y < SideY/2 - b2 + wchan + r1) {
+      (dist(this.x, this.y, SideX/2 + a2 - wchan - r1, SideY/2 - b2 + wchan + r1) > r1) ?  this.restartPos() : NaN;
+      this.x -= PullToVertex(this.x,this.y,(SideX/2 + a2-wchan-r1),(SideY/2 - b2 + wchan + r1)).dirX;
+      this.y -= PullToVertex(this.x,this.y,(SideX/2 + a2-wchan-r1),(SideY/2 - b2 + wchan + r1)).dirY;
+     }
+
+      //сектор симмитричный S24 по Oy 
+     if(this.x > SideX/2 + a2 - wchan - r1 & this.y > SideY/2 + b2 - wchan - r1) {
+      (dist(this.x, this.y, SideX/2 + a2 - wchan - r1, SideY/2 + b2 - wchan - r1) > r1) ?  this.restartPos() : NaN;
+      this.x -= PullToVertex(this.x, this.y, SideX/2 + a2 - wchan - r1, SideY/2 + b2 - wchan - r1).dirX;
+      this.y -= PullToVertex(this.x, this.y, SideX/2 + a2 - wchan - r1, SideY/2 + b2 - wchan - r1).dirY;
+     }
+
+      //сектор симметричный S24 по Ox 
+     if(this.x < SideX/2 - a2 + wchan + r1 & this.y < SideY/2 - b2 + wchan + r1) {
+      (dist(this.x, this.y, SideX/2 - a2 + wchan + r1, SideY/2 - b2 + wchan + r1) > r1) ?  this.restartPos() : NaN;
+      this.x -= PullToVertex(this.x, this.y, SideX/2 - a2 + wchan + r1, SideY/2 - b2 + wchan + r1).dirX;
+      this.y -= PullToVertex(this.x, this.y, SideX/2 - a2 + wchan + r1, SideY/2 - b2 + wchan + r1).dirY;
+     }
+
+      //сектор симметричный S24 по диагонали 
+     if(this.x < SideX/2 - a2 + wchan + r1 & this.y > SideY/2 + b2 - wchan - r1) {
+      (dist(this.x, this.y, SideX/2 - a2 + wchan + r1, SideY/2 + b2 - wchan - r1) > r1) ?  this.restartPos() : NaN;
+      this.x -= PullToVertex(this.x, this.y, SideX/2 - a2 + wchan + r1, SideY/2 + b2 - wchan - r1).dirX;
+      this.y -= PullToVertex(this.x, this.y, SideX/2 - a2 + wchan + r1, SideY/2 + b2 - wchan - r1).dirY;
+     }
+
+      // если частица вылетает за пределы контура центральной части или внешней части за каналом, - резетаем
+      if (!((this.x >= SideX/2 - a2 + wchan & this.x <= SideX/2 + a2 - wchan) & (this.y >= SideY/2 - b2 + wchan & this.y <= SideY/2 + b2 - wchan))) {
         this.restartPos();
       }
     }
@@ -169,23 +332,24 @@ let particles = [];
 
 
 function setup() {
+
   createCanvas(1000, 730);
 
 
   for(let i = 0; i<amountParticles; i++) {
-    particles.push(new MetalParticle());    
-
-    // particles[i].xFirst = particles[i].x;
-    // particles[i].yFirst = particles[i].y;
+    particles.push(new MetalParticle());
   }
 
+  b =  document.getElementById('b').value*10;
   b2 =  document.getElementById('b2').value*10;
+  a =  document.getElementById('a').value*10;
   a2 =  document.getElementById('a2').value*10;
-  b1 =  document.getElementById('b1').value*10;
-  a1 =  document.getElementById('a1').value*10;
   wchan =  document.getElementById('wchan').value*10;
-  SideX =  b1*2;;
-  SideY =  b2*2;
+  SideX =  a*2;;
+  SideY =  b*2;
+  r1 =  document.getElementById('r1').value*10;
+  r2 =  document.getElementById('r2').value*10;
+  r3 =  document.getElementById('r3').value*10;
 
   setGrid(particles);
 
@@ -195,32 +359,23 @@ function setup() {
 
 function draw() {
 
-  background('#2B2D31');
-
-  (counterFillChannel <= 84) ? fillChannel(counterFillChannel) : fillChannel(84);
-
-
+  background('#2b2D31');
   fill('#BAC3D5');
+  stroke('#333');
 
+  //вырисовка первого приближения
   if(firstApproach) {
-    beginShape();
-    vertex(width/2 - SideX/2, height/2 - SideY/2);
-    vertex(width/2 + SideX/2, height/2 - SideY/2);
-    vertex(width/2 + SideX/2, height/2 + SideY/2);
-    vertex(width/2 - SideX/2, height/2 + SideY/2);
 
+    rectMode(CENTER);
+    rect(width/2, height/2, SideX, SideY, r3);
 
-    beginContour();
-    vertex(width/2 - a1, height/2 - a2);
-    vertex(width/2 - a1, height/2 + a2);
-    vertex(width/2 + a1, height/2 + a2);
-    vertex(width/2 + a1, height/2 - a2);
-    endContour();
+    //постепенная заливка канала
+    (counterFillChannel <= 84) ? fillChannel(counterFillChannel) : fillChannel(84);
 
-    endShape();
+    fill('#BAC3D5');
+    rect(width/2, height/2, a2*2-wchan*2, b2*2-wchan*2, r1);
 
-    rect(width/2 - a1 + wchan, height/2 - a2 + wchan, a1*2-wchan*2, a2*2-wchan*2);
-
+    push();
     translate(width/2 - SideX/2,height/2 - SideY/2);
     fill('red');
 
@@ -231,28 +386,25 @@ function draw() {
       particles[i].makeTrace();
     }
 
+    pop();
+
+    defLines();
+
   }
 
+  //вырисовка второго приближения
    if(!firstApproach) {
-    beginShape();
-    vertex(-SideX/2, height - SideY/2);
-    vertex(SideX/2, height - SideY/2);
-    vertex(SideX/2, height + SideY/2);
-    vertex(-SideX/2, height + SideY/2);
 
+    rectMode(CENTER);
+    rect(0, height, SideX, SideY, r3);
 
-    beginContour();
-    vertex(-a1, height - a2);
-    vertex(-a1, height + a2);
-    vertex(a1, height + a2);
-    vertex(a1, height - a2);
-    endContour();
-
-    endShape(CLOSE);
+    //постепенная заливка канала
+    (counterFillChannel <= 84) ? fillChannel(counterFillChannel) : fillChannel(84);
 
     fill('#BAC3D5');
-    rect(- a1 + wchan, height - a2 + wchan, a1*2-wchan*2, a2*2-wchan*2);
+    rect(0, height, a2*2-wchan*2, b2*2-wchan*2, r1);
 
+    push();
     translate(-SideX/2, height-SideY/2);
     fill('red');
 
@@ -261,9 +413,14 @@ function draw() {
       particles[i].moveParticle();
       particles[i].makeTrace();
     }
-  
+    pop();
+
+    defLines();
+
    }
-  
+
+
+
   
 }
 
@@ -271,36 +428,63 @@ function draw() {
 
 function setGrid(particles) {
 
-  let devider = ceil(amountParticles/maxParticlesVertical); //делитель определяет количество стобцов на которое будет разбиваться сетка из частиц
+  let devider = ceil(firstAmountParticles/maxParticlesVertical); //делитель определяет количество стобцов на которое будет разбиваться сетка из частиц
 
   for(let a = 0; a<devider; a++) {
-  let sliceParticles = particles.slice((amountParticles/devider)*a, (amountParticles/devider)*(a+1));
+  let sliceParticles = particles.slice((firstAmountParticles/devider)*a, (firstAmountParticles/devider)*(a+1));
 
   for (let i = 0; i<sliceParticles.length; i++) {
 
     let posX = (a+1)*SideX/(devider+1);
     let posY = (i+1)*SideY/(sliceParticles.length+1);
 
-    if( (posX <= SideX/2 + a1 & posY <= SideY/2 + a2) & (posX >= SideX/2 - a1 & posY >= SideY/2 - a2)) {
-      //проверяем расположение частиц относительно внутренного контура, если попадают, то перепрыгиваем на следующую итерацию, не присваивая значения
+     //проверяем расположение частиц относительно внутренного контура, если попадают, то перепрыгиваем на следующую итерацию, не присваивая значения
+    if( (posX <= SideX/2 + a2 & posX >= SideX/2 - a2 ) & (posY <= SideY/2 + b2 & posY >= SideY/2 - b2)) { 
+
+
+      let bigDiag = sqrt(sq(r2) + sq(r2));
+      let bigDelta = bigDiag - r2;
+
+      let diag = sqrt(sq(r1) + sq(r1));
+      let delta = diag - r1;
       
-      if (!((posX >= SideX/2 - a1 + wchan & posX <= SideX/2 + a1 - wchan) & (posY >= SideY/2 - a2 + wchan & posY <= SideY/2 + a2 -wchan))) {
-        sliceParticles[i].x = NaN; // Убираем частицы, которые попадают в новый внутренний контур при изменение параметров изделия
+
+       // Убираем частицы, которые попадают в новый внутренний контур при изменении параметров изделия
+      if (!((posX >= SideX/2 - a2 + wchan & posX <= SideX/2 + a2 - wchan) & (posY >= SideY/2 - b2 + wchan & posY <= SideY/2 + b2 - wchan)) & (dist(SideX/2, SideY/2, posX, posY) < sqrt(sq(a2) + sq(b2)) - bigDelta ) ) { 
+       
+        // (dist(SideX/2, SideY/2, posX, posY) <= sqrt(sq(a2 - wchan) + sq(b2 - wchan)) + wchan - 1 )
+        sliceParticles[i].x = NaN; 
         sliceParticles[i].y = NaN;
         sliceParticles[i].xFirst = NaN;
         sliceParticles[i].yFirst = NaN;
         continue;
       }
 
-      // if( posX >= SideX/2-a1 & posY >= SideY/2 - a2  ) {
-      //   sliceParticles[i].x = NaN; // Убираем частицы, которые попадают в новый внутренний контур при изменение параметров изделия
-      //   sliceParticles[i].y = NaN;
-      //   sliceParticles[i].xFirst = NaN;
-      //   sliceParticles[i].yFirst = NaN;
+      else if(((posX >= SideX/2 - a2 + wchan & posX <= SideX/2 + a2 - wchan) & (posY >= SideY/2 - b2 + wchan & posY <= SideY/2 + b2 - wchan)) & (dist(SideX/2, SideY/2, posX, posY) > sqrt(sq(a2 - wchan) + sq(b2 - wchan)) - delta )  ) {
+        sliceParticles[i].x = NaN; 
+        sliceParticles[i].y = NaN;
+        sliceParticles[i].xFirst = NaN;
+        sliceParticles[i].yFirst = NaN;
+        continue;
+      }
 
-      //   continue;
-      // }
     }
+
+    // убираем частицы, которые остались после обрезания углов заготовки r3
+    else {
+      let diag = sqrt(sq(r3) + sq(r3));
+      let delta = diag - r3;
+
+      if ( dist(SideX/2, SideY/2, posX, posY) > sqrt(sq(SideX/2) + sq(SideY/2)) - delta  ) { 
+       
+        sliceParticles[i].x = NaN; 
+        sliceParticles[i].y = NaN;
+        sliceParticles[i].xFirst = NaN;
+        sliceParticles[i].yFirst = NaN;
+        continue;
+      }
+    }
+
 
     sliceParticles[i].x = posX;
     sliceParticles[i].y = posY;
@@ -321,23 +505,29 @@ function getShape(event) {
   if(!checkInp()) {event.preventDefault()};
 
   if(firstApproach) {
+    b =  document.getElementById('b').value*10;
     b2 =  document.getElementById('b2').value*10;
+    a =  document.getElementById('a').value*10;
     a2 =  document.getElementById('a2').value*10;
-    b1 =  document.getElementById('b1').value*10;
-    a1 =  document.getElementById('a1').value*10;
-    SideX =  b1*2;
-    SideY =  b2*2;
+    SideX =  a*2;
+    SideY =  b*2;
     wchan =  document.getElementById('wchan').value*10;
+    r1 =  document.getElementById('r1').value*10;
+    r2 =  document.getElementById('r2').value*10;
+    r3 =  document.getElementById('r3').value*10;
   }
 
   else {
+    b =  2.3*document.getElementById('b').value*10;
     b2 =  2.3*document.getElementById('b2').value*10;
+    a =  2.3*document.getElementById('a').value*10;
     a2 =  2.3*document.getElementById('a2').value*10;
-    b1 =  2.3*document.getElementById('b1').value*10;
-    a1 =  2.3*document.getElementById('a1').value*10;
-    SideX =  b1*2;
-    SideY =  b2*2;
+    SideX =  a*2;
+    SideY =  b*2;
     wchan =  2.3*document.getElementById('wchan').value*10;
+    r1 =  2.3*document.getElementById('r1').value*10;
+    r2 =  2.3*document.getElementById('r2').value*10;
+    r3 =  2.3*document.getElementById('r3').value*10;
   }
  
 
@@ -358,22 +548,52 @@ function getShape(event) {
 function checkInp() {
 
   //Проверка, на пустые инпуты
-  if (Number(document.getElementById('a1').value) >= Number(document.getElementById('b1').value)) {
-    alert('Значение b1 должно быть > a1');
+  if (Number(document.getElementById('a2').value) >= Number(document.getElementById('a').value)) {
+    alert('Значение a должно быть > a2');
     return false;
   }
-  else if (Number(document.getElementById('a2').value) >= Number(document.getElementById('b2').value)) {
-    alert('Значение b2 должно быть > a2');
-    return false;
-  }
-
-  else if (Number(document.getElementById('wchan').value) >= Number(document.getElementById('a1').value)) {
-    alert('Значение ширины канала не должно быть > а1');
+  else if (Number(document.getElementById('b2').value) >= Number(document.getElementById('b').value)) {
+    alert('Значение b должно быть > b2');
     return false;
   }
 
   else if (Number(document.getElementById('wchan').value) >= Number(document.getElementById('a2').value)) {
+    alert('Значение ширины канала не должно быть > а1');
+    return false;
+  }
+
+  else if (Number(document.getElementById('wchan').value) >= Number(document.getElementById('b2').value)) {
     alert('Значение ширины канала не должно быть > а2');
+    return false;
+  }
+
+  // else if (sq(Number(document.getElementById('r3').value)) > (Number(document.getElementById('b2').value) * Number(document.getElementById('a2').value))/2 ) {
+  //   alert('Значение r3*r3 не может быть > (a2 * b2)/2, иначе обрежется канал заготовки');
+  //   return false;
+  // }
+
+  // else if (Number(document.getElementById('r3').value) > Number(document.getElementById('b').value) || Number(document.getElementById('r3').value) > Number(document.getElementById('a').value) ) {
+  //   alert('Значение r3 не может быть > a или b, согласно геометрическим ограничениям прямоугольника со скрулёнными углами ');
+  //   return false;
+  // }
+
+  else if ( Number(document.getElementById('r3').value) > Math.min(Number(document.getElementById('a').value), Number(document.getElementById('b').value) )  ) {
+    alert(`Максимальное значение скругления r3 при текущих параметрах заготовки = ${Math.min(Number(document.getElementById('a').value), Number(document.getElementById('b').value))}`);
+    return false;
+  }
+
+  else if ( Number(document.getElementById('r2').value) > Math.min(Number(document.getElementById('a2').value), Number(document.getElementById('b2').value))  ) {
+    alert(`Максимальное значение скругления r2 при текущих параметрах заготовки = ${Math.min(Number(document.getElementById('a2').value), Number(document.getElementById('b2').value) )}`);
+    return false;
+  }
+
+  else if ( Number(document.getElementById('r2').value) < sqrt(2*sq(Number(document.getElementById('r2').value) - Number(document.getElementById('wchan').value)  ) )  ) {
+    alert(`Максимальное значение скругления r2 при текущих параметрах заготовки = ${ (-Number(document.getElementById('wchan').value)*sqrt(2)/(1-sqrt(2)) ) }`);
+    return false;
+  }
+
+  else if (Number(document.getElementById('r1').value) > Math.min((Number(document.getElementById('a2').value) - Number(document.getElementById('wchan').value)), (Number(document.getElementById('b2').value) - Number(document.getElementById('wchan').value)))  ) {
+    alert(`Максимальное значение скругления r1 при текущих параметрах заготовки = ${Math.min((Number(document.getElementById('a2').value) - Number(document.getElementById('wchan').value)), (Number(document.getElementById('b2').value) - Number(document.getElementById('wchan').value)) )}`);
     return false;
   }
 
@@ -385,6 +605,7 @@ function checkInp() {
 
 function resetSketch() {
   counterFillChannel = 45;
+  deleteAddedParicles();
   stopDraw();
 
   for(let i = 0; i<particles.length; i++) {
@@ -393,16 +614,6 @@ function resetSketch() {
   }   
 }
 
-// function reDrawRandomParticles() {
-
-//   stopDraw()
-
-//   for(let i = 0; i<particles.length; i++) {
-//     particles[i].x = random(10, SideX-10);
-//     particles[i].y = random(10, SideY-10);
-//   } 
-
-// }
 
 
 function stopDraw() {
@@ -432,20 +643,26 @@ function PullToVertex(x,y,hx,hy) {
 }
 
 
+
 function changeApproach() {
+
+  deleteAddedParicles();
 
   firstApproach = !firstApproach;
 
   if(!firstApproach) {
     
+    b *= 2.3;
     b2 *= 2.3;
+    a *= 2.3;
     a2 *= 2.3;
-    b1 *= 2.3;
-    a1 *= 2.3;
     wchan *= 2.3;
     SideX *= 2.3;
     SideY *= 2.3;
     constSpeed *= 2.3;
+    r1 *= 2.3;
+    r2 *= 2.3;
+    r3 *= 2.3;
 
     setGrid(particles);
     firstApproach = false;
@@ -455,14 +672,17 @@ function changeApproach() {
 
   else {
     
+    b /= 2.3;
     b2 /= 2.3;
+    a /= 2.3;
     a2 /= 2.3;
-    b1 /= 2.3;
-    a1 /= 2.3;
     wchan /= 2.3;
     SideX /= 2.3;
     SideY /= 2.3;
     constSpeed /= 2.3;
+    r1 /= 2.3;
+    r2 /= 2.3;
+    r3 /= 2.3;
 
     setGrid(particles);
     firstApproach = true;
@@ -478,42 +698,92 @@ function fillChannel(i) {
   colorMode(HSB);
   fill(220,13,i);
 
-  if(firstApproach) {
-    beginShape();
-    vertex(width/2 - a1, height/2 - a2);
-    vertex(width/2 + a1, height/2 - a2);
-    vertex(width/2 + a1, height/2 + a2);
-    vertex(width/2 - a1, height/2 + a2);
+  if(firstApproach) rect(width/2, height/2, a2*2, b2*2, r2);
 
+  else rect(0, height, a2*2, b2*2, r2);
 
-    beginContour();
-    vertex(width/2 - a1 + wchan, height/2 - a2 + wchan);
-    vertex(width/2 - a1 + wchan, height/2 + a2 - wchan);
-    vertex(width/2 + a1 - wchan, height/2 + a2 - wchan);
-    vertex(width/2 + a1 - wchan, height/2 - a2 + wchan);
-    endContour();
-
-    endShape();
-  }
-
-  else {
-    beginShape();
-
-    vertex(-a1, height - a2);
-    vertex(a1, height - a2);
-    vertex(a1, height + a2);
-    vertex(-a1, height + a2);
-
-    beginContour();
-    vertex(-a1 + wchan, height - a2 + wchan);
-    vertex(-a1 + wchan, height + a2 - wchan);
-    vertex(a1 - wchan, height + a2 - wchan);
-    vertex(a1 - wchan, height - a2 + wchan);
-  
-    endContour();
-    endShape();
-  }
   
   colorMode(RGB);
 }
 
+
+function defLines() {
+
+  strokeWeight(2);
+
+  if(firstApproach) {
+    stroke('#FFAA64');
+    line(0, height/2 - b+r3, width, height/2 - b+r3);
+    stroke('#48FF54');
+    line(width/2+a-r3,height,width/2+a-r3,0);
+    stroke('#FF70C7');
+    line(0,height/2 - b2 + wchan + r1,width,height/2 - b2 + wchan + r1);
+    stroke('#C7CDFF');
+    line(width/2 + a2 - wchan - r1,0, width/2 + a2 - wchan - r1, height);
+
+    noStroke();
+    fill(255);
+    textSize(15);
+    text('b-r3',width-50, height/2 - b+r3 - 5);
+    text('a-r3',width/2+a-r3 + 5, 25); 
+    text('b1-r1',width-50, height/2 - b2 + wchan + r1 +20);
+    text('a1-r1',width/2 + a2 - wchan - r1 -50, 25);
+  }
+
+  else {
+    stroke('#FFAA64');
+    line(0, height - b+r3, width, height - b +r3);
+    stroke('#48FF54');
+    line(a-r3,height,a-r3,0);
+    stroke('#FF70C7');
+    line(0,height - b2 + wchan + r1,width,height - b2 + wchan + r1);
+    stroke('#C7CDFF');
+    line(a2 - wchan - r1,0, a2 - wchan - r1, height);
+
+    noStroke();
+    fill(255);
+    textSize(15);
+    text('b-r3',width - 50,  height - b+r3 - 5);
+    text('a-r3',a-r3 + 5, 20); 
+    text('b1-r1', width - 50, height - b2 + wchan + r1 +20);
+    text('a1-r1',a2 - wchan - r1 -50, 20);
+  }
+
+  strokeWeight(1);
+ 
+}
+
+
+function mouseClicked() {
+  //Добавляем новую частицу при нажатии
+  particles.push(new MetalParticle());
+  amountParticles += 1;
+  
+  particles[amountParticles - 1].x = mouseX;
+  particles[amountParticles - 1].y = mouseY;
+  particles[amountParticles - 1].createParticle();
+
+  if (firstApproach) {
+    // translate(width/2 - SideX/2,height/2 - SideY/2);
+    //т.к в функции draw происходит translate (смещение кисти) перед рисованием точек, нужно так же сместиться (в текущем случае в верхний левый угол заготовки)
+    particles[amountParticles - 1].x = mouseX - (width/2 - SideX/2);
+    particles[amountParticles - 1].y = mouseY - (height/2 - SideY/2);
+    particles[amountParticles - 1].xFirst = mouseX - (width/2 - SideX/2);
+    particles[amountParticles - 1].yFirst = mouseY - (height/2 - SideY/2);
+  }
+
+  else {
+    // translate(-SideX/2, height-SideY/2);
+    particles[amountParticles - 1].x = mouseX  + SideX/2;
+    particles[amountParticles - 1].y = mouseY - (height - SideY/2);
+    particles[amountParticles - 1].xFirst = mouseX + SideX/2;
+    particles[amountParticles - 1].yFirst = mouseY - (height - SideY/2);
+  }
+  
+}
+
+function deleteAddedParicles() {
+  //удаляем все добавленные мышкой частицы до первоначального количества
+  amountParticles = firstAmountParticles;
+  particles = particles.slice(0, amountParticles);
+}

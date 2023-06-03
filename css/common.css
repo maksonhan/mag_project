@@ -4,6 +4,7 @@ body {
 	width: 100%;
 	height: 100%;
 	overflow-x: hidden;
+	font-size: 14px;
 	font-family: 'Montserrat';
 	font-weight: 500;
 	padding-bottom: 100px;
@@ -36,22 +37,33 @@ section {
 .container {
 	width: 100%;
 	display: flex;
+	justify-content: space-around;
 }
 
+.task-img_block {
+	width: 60% ;
+	margin: 0 auto;
+}
+
+.task-img_block img {
+	width: 100%;
+}
+
+
 .inp-param_block {
-	width: 70%;
-	margin-right: 50px;
+	width: 45%;
 }
 
 .inp-param_block table {
-	border-spacing: 25px 30px;
+	margin: 0 auto;
+	border-spacing: 25px 20px;
 }
 
 .inp-param_block table td input {
 	padding: 5px 0px 5px 5px;
 }
 
-.inp-param_block table td a, .startSim, .resetSketch, .reDrawRandomParticles, .changeApproach {
+.inp-param_block table td a, .startSim, .resetSketch, .reDrawRandomParticles, .changeApproach, .plot {
 	border-radius: 10px;
 	display: block;
 	text-align: center;
@@ -68,17 +80,21 @@ section {
 	transition: all .45s;
 }
 
-.inp-param_block table td a {
+.plot {
+	width: 350px;
+	margin: 50px auto;
 	background: linear-gradient(101.03deg, #F27676 1.28%, #B01C90 100%);
 }
 
-.inp-param_block table td a:hover {
+.plot:hover {
 	background: linear-gradient(101.03deg, #B01C90 100%, #F27676 1.28%);
 }
 
 
+
+
 .simulation {
-	margin-top: 50px;
+	margin-top: 100px;
 	display: flex;
 	width: 100%;
 	align-items: center;
@@ -123,10 +139,6 @@ section {
 
 .reDrawRandomParticles:hover {
 	opacity: 0.7;
-}
-
-.task-img_block img {
-	width: 100%;
 }
 
 

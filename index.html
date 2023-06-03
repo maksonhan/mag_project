@@ -14,10 +14,12 @@
 		<section class="main-section">
 
 		<div class="wrapper">
-			<h1>Вводные параметры</h1>
+			<h1>Задача о сжатии вязкопластического материала между жесктими плитами</h1>
+			<div class="task-img_block">
+				<img src="img/1.jpg" alt="Двумерное представление процесса штамповки плоского фланца прямоугольной формы">
+			</div>
 			<div class="container">
 				<div class="inp-param_block">
-
 					<table>
 						<tr>
 							<td>Высота изделия (h)</td>
@@ -25,29 +27,36 @@
 							<td>(мм)</td>
 						</tr>
 						<tr>
-							<td>Напряжение текучести при сдвиге (тета)</td>
-							<td><input id="tetaS" name="напряжение текучести при сдвиге" placeholder="0" value="10" type="text" maxlength="9"></td>
-							<td>(МПа)</td>
-						</tr>
-						<tr>
-							<td>Внутренняя граница по X (a1)</td>
-							<td><input id="a1" name="a1" placeholder="0" value="25" type="text" maxlength="9"></td>
-							<td>(мм)</td>
-						</tr>
-						<tr>
-							<td>Внешняя граница по X (b1)</td>
-							<td><input id="b1" name="b1" placeholder="0" value="40" type="text" maxlength="9"></td>
-							<td>(мм)</td>
-						</tr>
-						<tr>
-							<td>Внутренняя граница по Y (a2)</td>
+							<td>Внутренняя граница по X (a2)</td>
 							<td><input id="a2" name="a2" placeholder="0" value="15" type="text" maxlength="9"></td>
 							<td>(мм)</td>
 						</tr>
 						<tr>
-							<td>Внешняя граница по Y (b2)</td>
-							<td><input id="b2" name="b2" placeholder="0" value="30" type="text" maxlength="9"></td>
+							<td>Внешняя граница по X (a)</td>
+							<td><input id="a" name="a" placeholder="0" value="40" type="text" maxlength="9"></td>
 							<td>(мм)</td>
+						</tr>
+						<tr>
+							<td>Внутренняя граница по Y (b2)</td>
+							<td><input id="b2" name="b2" placeholder="0" value="10" type="text" maxlength="9"></td>
+							<td>(мм)</td>
+						</tr>
+						<tr>
+							<td>Внешняя граница по Y (b)</td>
+							<td><input id="b" name="b" placeholder="0" value="25" type="text" maxlength="9"></td>
+							<td>(мм)</td>
+						</tr>
+					</table>
+
+				</div>
+
+				<div class="inp-param_block">
+
+					<table>
+						<tr>
+							<td>Напряжение текучести при сдвиге (тета)</td>
+							<td><input id="tetaS" name="напряжение текучести при сдвиге" placeholder="0" value="10" type="text" maxlength="9"></td>
+							<td>(МПа)</td>
 						</tr>
 						<tr>
 							<td>Ширина канала</td>
@@ -55,7 +64,19 @@
 							<td>(мм)</td>
 						</tr>
 						<tr>
-							<td><a onclick="getShape();plot()">Построить</a></td>
+							<td>Радиус закругления внешних уголков r3</td>
+							<td><input id="r3" name="r3" placeholder="0" value="25" type="text" maxlength="9"></td>
+							<td>(мм)</td>
+						</tr>
+						<tr>
+							<td>Радиус закругления внешнего угла канала r2</td>
+							<td><input id="r2" name="r2" placeholder="0" value="6" type="text" maxlength="9"></td>
+							<td>(мм)</td>
+						</tr>
+						<tr>
+							<td>Радиус закругления центральной части r1</td>
+							<td><input id="r1" name="r1" placeholder="0" value="5" type="text" maxlength="9"></td>
+							<td>(мм)</td>
 						</tr>
 
 					</table>
@@ -63,11 +84,10 @@
 
 				</div>
 
-				<div class="task-img_block">
-					<img src="img/1.JPG" alt="Двумерное представление процесса штамповки плоского фланца прямоугольной формы">
-				</div>
 
 			</div>
+
+			<a class="plot" onclick="getShape();plot()">Построить</a>
 		</div>
 
 		</section>
