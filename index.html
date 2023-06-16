@@ -22,28 +22,33 @@
 				<div class="inp-param_block">
 					<table>
 						<tr>
-							<td>Высота изделия (h)</td>
-							<td><input id="height" name="height" placeholder="0" value="5" type="text" pattern="\d+(\.\d{2})?" maxlength="9"></td>
+							<td>Толщина изделия (h0)</td>
+							<td><input id="height" name="height" placeholder="0" value="4" type="text" pattern="\d+(\.\d{2})?" maxlength="9"></td>
+							<td>(мм)</td>
+						</tr>
+						<tr>
+							<td>До какой толщины сжимаем (h)</td>
+							<td><input id="minHeight" name="minHeight" placeholder="0" value="2.8" type="text" pattern="\d+(\.\d{2})?" maxlength="9"></td>
 							<td>(мм)</td>
 						</tr>
 						<tr>
 							<td>Внутренняя граница по X (a2)</td>
-							<td><input id="a2" name="a2" placeholder="0" value="15" type="text" maxlength="9"></td>
+							<td><input id="a2" name="a2" placeholder="0" value="5" type="text" maxlength="9"></td>
 							<td>(мм)</td>
 						</tr>
 						<tr>
 							<td>Внешняя граница по X (a)</td>
-							<td><input id="a" name="a" placeholder="0" value="40" type="text" maxlength="9"></td>
+							<td><input id="a" name="a" placeholder="0" value="35" type="text" maxlength="9"></td>
 							<td>(мм)</td>
 						</tr>
 						<tr>
 							<td>Внутренняя граница по Y (b2)</td>
-							<td><input id="b2" name="b2" placeholder="0" value="10" type="text" maxlength="9"></td>
+							<td><input id="b2" name="b2" placeholder="0" value="5" type="text" maxlength="9"></td>
 							<td>(мм)</td>
 						</tr>
 						<tr>
 							<td>Внешняя граница по Y (b)</td>
-							<td><input id="b" name="b" placeholder="0" value="25" type="text" maxlength="9"></td>
+							<td><input id="b" name="b" placeholder="0" value="12.5" type="text" maxlength="9"></td>
 							<td>(мм)</td>
 						</tr>
 					</table>
@@ -54,28 +59,28 @@
 
 					<table>
 						<tr>
-							<td>Напряжение текучести при сдвиге (тета)</td>
+							<td>Предел текучести при сдвиге (тета)</td>
 							<td><input id="tetaS" name="напряжение текучести при сдвиге" placeholder="0" value="10" type="text" maxlength="9"></td>
 							<td>(МПа)</td>
 						</tr>
 						<tr>
 							<td>Ширина канала</td>
-							<td><input id="wchan" name="wchan" placeholder="0" value="2" type="text" maxlength="9"></td>
+							<td><input id="wchan" name="wchan" placeholder="0" value="1" type="text" maxlength="9"></td>
 							<td>(мм)</td>
 						</tr>
 						<tr>
 							<td>Радиус закругления внешних уголков r3</td>
-							<td><input id="r3" name="r3" placeholder="0" value="25" type="text" maxlength="9"></td>
+							<td><input id="r3" name="r3" placeholder="0" value="2" type="text" maxlength="9"></td>
 							<td>(мм)</td>
 						</tr>
 						<tr>
 							<td>Радиус закругления внешнего угла канала r2</td>
-							<td><input id="r2" name="r2" placeholder="0" value="6" type="text" maxlength="9"></td>
+							<td><input id="r2" name="r2" placeholder="0" value="2" type="text" maxlength="9"></td>
 							<td>(мм)</td>
 						</tr>
 						<tr>
 							<td>Радиус закругления центральной части r1</td>
-							<td><input id="r1" name="r1" placeholder="0" value="5" type="text" maxlength="9"></td>
+							<td><input id="r1" name="r1" placeholder="0" value="2" type="text" maxlength="9"></td>
 							<td>(мм)</td>
 						</tr>
 
@@ -87,7 +92,8 @@
 
 			</div>
 
-			<a class="plot" onclick="getShape();plot()">Построить</a>
+			<!-- <a class="plot" onclick="getShape();plot()">Построить</a> -->
+			<a class="plot" onclick="getShape()">Построить</a>
 		</div>
 
 		</section>
@@ -104,12 +110,26 @@
 			<tr>
 				<td><a id="changeApproach" class="changeApproach" onclick="changeApproach()">Второе приблжение</a></td>
 			</tr>
+			<tr>
+				<td><a id="exp" class="exp" onclick="experiment()">Режим эксперимента</a></td>
+			</tr>
 <!-- 			<tr>
 				<td><a class="reDrawRandomParticles" onclick="reDrawRandomParticles()">Случайное расположение частиц</a></td>
 			</tr> -->
 			</table>
 		</section>
 
+		<section id="resExp" class="resexp-section">
+			<h1>Результаты эксперимента:</h1>
+			<p id="tExp">Время процесса</p>
+			<p id ="heightExp">Текущая толщина заготовки</p>
+			<table id = "trResults">
+				<tr>
+					<th>X  - начальное положение слоя, мм</th>
+					<th>U - смещение слоя, мм </th>
+				</tr>
+			</table>
+		</section>		
 		
 
 		<section id="chart-section" class="chart-section">

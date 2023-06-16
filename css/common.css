@@ -63,7 +63,7 @@ section {
 	padding: 5px 0px 5px 5px;
 }
 
-.inp-param_block table td a, .startSim, .resetSketch, .reDrawRandomParticles, .changeApproach, .plot {
+.inp-param_block table td a, .startSim, .resetSketch, .reDrawRandomParticles, .changeApproach, .plot, .exp {
 	border-radius: 10px;
 	display: block;
 	text-align: center;
@@ -132,6 +132,15 @@ section {
 	background: linear-gradient(9.7deg, #E0E7FF 6.4%, #FFB9B9 91.87%);
 }
 
+.exp{
+	background-color: #FDF27B;
+	color:#333;
+}
+
+.exp:hover {
+	background-color: #E1D76D;
+}
+
 .reDrawRandomParticles{
 	background-color: lightgreen;
 	color:#333;
@@ -155,4 +164,20 @@ section {
 	margin: 50px auto 0px auto;
 	width: 80%;
 	height: 500px;
+}
+
+.resexp-section {
+	display: none;
+	margin-top: 50px;
+	text-align: center;
+}
+
+.resexp-section table {
+	margin: 0 auto;
+}
+
+.resexp-section table tr th, .resexp-section table tr td {
+	outline: 1px solid #333;
+	padding: 15px;
+	width: 200px;
 }

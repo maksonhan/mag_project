@@ -73,7 +73,7 @@ function getChartData(event) {
 	if(!checkInputs(height,tetaS,a2,a,b2,b)) {event.preventDefault()};
 
 	let chartData = createChartData(height,tetaS,a2,a,b2,b);
-	console.log(chartData);
+	// console.log(chartData);
 	return chartData;
 }
 
